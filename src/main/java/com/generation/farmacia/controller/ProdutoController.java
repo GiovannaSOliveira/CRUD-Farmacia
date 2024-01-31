@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -61,10 +62,22 @@ public class ProdutoController {
 		return ResponseEntity.ok(produtoRepository.findAllByDescricaoContainingIgnoreCase(descricao));
 	}
 	
-	@GetMapping("/preco/{preco}")
-	public ResponseEntity <List<Produto>> getByBigDecimal(@PathVariable BigDecimal preco){
-		return ResponseEntity.ok(produtoRepository.findAllByPreco(preco));
+	@GetMapping("/preco")
+	public ResponseEntity<List<Produto>> findByPrecoBetween(@RequestParam BigDecimal minPreco, @RequestParam BigDecimal maxPreco) {
+	    try {
+	        List<Produto> produtos = produtoRepository.findAllByPrecoBetween(minPreco, maxPreco);
+
+	        if (produtos.isEmpty()) {
+	            return ResponseEntity.noContent().build();
+	        }
+
+	        return ResponseEntity.ok(produtos);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	    }
 	}
+
 	
 	@PostMapping
 	public ResponseEntity<Produto> post (@Valid @RequestBody Produto produto){

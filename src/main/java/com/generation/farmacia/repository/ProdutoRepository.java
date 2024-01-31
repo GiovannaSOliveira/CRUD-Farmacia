@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.generation.farmacia.model.Produto;
@@ -14,5 +15,6 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
 
 	public List <Produto> findAllByDescricaoContainingIgnoreCase(@Param("%descricao%") String descricao);
 	
-	public List <Produto> findAllByPreco(@Param("%preco%") BigDecimal preco);
+	@Query("SELECT p FROM Produto p WHERE p.preco BETWEEN :minPreco AND :maxPreco")
+	List<Produto> findAllByPrecoBetween(@Param("minPreco") BigDecimal minPreco, @Param("maxPreco") BigDecimal maxPreco);
 }
